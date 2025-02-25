@@ -1,0 +1,14 @@
+{
+  "name": "sensor",
+  "verbose": true,
+  "frequency": 500,
+  "output": {
+    "type": "csv",
+    "outdir": "/sensor_data"
+  },
+  "system": {
+    "rapl": {
+      "events": ["RAPL_ENERGY_PKG"]
+    }
+  }
+}

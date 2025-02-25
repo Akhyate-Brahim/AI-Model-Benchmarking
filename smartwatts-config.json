@@ -1,0 +1,26 @@
+{
+  "verbose": true,
+  "stream": true,
+  "input": {
+    "puller": {
+      "model": "HWPCReport",
+      "type": "mongodb",
+      "uri": "mongodb://mongo_source:27017",
+      "db": "test",
+      "collection": "prep"
+    }
+  },
+  "output": {
+    "pusher_power": {
+      "type": "influxdb2",
+      "uri": "http://influxdb:8086",
+      "db": "power_consumption",
+      "org": "org_test",
+      "token": "YOUR_TOKEN"
+    }
+  },
+  "cpu-base-freq": 3700,
+  "cpu-error-threshold": 2.0,
+  "disable-dram-formula": true,
+  "sensor-reports-frequency": 500
+}

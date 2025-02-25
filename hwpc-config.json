@@ -1,0 +1,29 @@
+{
+  "name": "sensor",
+  "verbose": true,
+  "frequency": 500,
+  "output": {
+    "type": "mongodb",
+    "uri": "mongodb://mongo_source:27017",
+    "database": "test",
+    "collection": "prep"
+  },
+  "system": {
+    "rapl": {
+      "events": ["RAPL_ENERGY_PKG"],
+      "monitoring_type": "MONITOR_ONE_CPU_PER_SOCKET"
+    },
+    "msr": {
+      "events": ["TSC", "APERF", "MPERF"]
+    }
+  },
+  "container": {
+    "core": {
+      "events": [
+        "CYCLES_NOT_IN_HALT",
+        "RETIRED_INSTRUCTIONS",
+        "RETIRED_OPS"
+      ]
+    }
+  }
+}

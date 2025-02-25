@@ -1,0 +1,78 @@
+networks:
+  powerapi-network:
+    driver: bridge
+
+services:
+  mongo_source:
+    image: mongo
+    container_name: mongo_source
+    networks:
+      - powerapi-network
+    ports:
+      - "27017:27017"
+
+  influxdb:
+    image: influxdb:2
+    container_name: influxdb
+    networks:
+      - powerapi-network
+    ports:
+      - "8086:8086"
+    volumes:
+      - /tmp/powerapi-influx/data:/var/lib/influxdb2
+      - /tmp/powerapi-influx/config:/etc/influxdb2
+    environment:
+      INFLUXDB_ADMIN_USER: admin
+      INFLUXDB_ADMIN_PASSWORD: adminpassword
+      INFLUXDB_ORG: org_test
+      INFLUXDB_BUCKET: power_consumption
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
+      interval: 10s
+      retries: 5
+
+  hwpc_sensor:
+    image: powerapi/hwpc-sensor
+    container_name: hwpc-sensor
+    networks:
+      - powerapi-network
+    privileged: true
+    pid: host
+    volumes:
+      - /sys:/sys
+      - /proc:/proc
+      - ./hwpc-config.json:/config_file.json
+    command: --config-file /config_file.json
+    depends_on:
+      - mongo_source
+
+  smartwatts:
+    image: powerapi/smartwatts-formula
+    container_name: smartwatts
+    networks:
+      - powerapi-network
+    volumes:
+      - ./smartwatts-config.json:/config_file.json
+    command: --config-file /config_file.json
+    depends_on:
+      influxdb:
+        condition: service_healthy
+      mongo_source:
+        condition: service_started
+      hwpc_sensor:
+        condition: service_started
+        
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    networks:
+      - powerapi-network
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    depends_on:
+      - influxdb
+
+volumes:
+  grafana-storage:
