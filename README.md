@@ -23,7 +23,7 @@ For full details, see the PowerAPI guide: **https://powerapi.org/reference/overv
 - Script comparing multiple CNN models [cnn_comparison.py](scripts/cnn_comparison.py)
 
 - Script used to plot the power consumption of each model, using PDU power data and PowerAPI data [record_power.py](scripts/record_power.py), make sure to replace the token
-## Power Measurement: nvidia-smi & PDU
+## LLMs benchmarking
 
 ## Overview  
 
