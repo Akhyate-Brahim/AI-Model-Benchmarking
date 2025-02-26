@@ -24,16 +24,37 @@ For full details, see the PowerAPI guide: **https://powerapi.org/reference/overv
 
 - Script used to plot the power consumption of each model, using PDU power data and PowerAPI data [record_power.py](scripts/record_power.py), make sure to replace the token
 ## Power Measurement: nvidia-smi & PDU
-We use `unified_measure.sh` to measure power consumption:
-- GPU Power: Retrieved using nvidia-smi.
-- System Power: Measured via PDU (SNMP protocol) using powernet45.mib.
-- Storage: Power data is logged into a CSV file.
-### Comparing LLMs:
-- Script: llms.py
-- Purpose: Benchmarks different LLMs by answering the same question and measuring:
-    - Generation speed
-    - Power consumption during inference
-Power Measurement: Uses unified_measure.sh to track both GPU and system power usage.
-### Comparing Image Generation Models
-- Script: image_generation.py
-- Purpose: Generates images using different models with the same prompt to compare performance and power efficiency.
+
+## Overview  
+
+`llms.py` benchmarks **LLMs (Large Language Models)** by measuring their power consumption while running. It records **GPU power usage** (via `nvidia-smi`) and **PDU power consumption** (via `snmpget`), logs the results, and calculates efficiency metrics like **energy per token**.  
+
+## Features  
+
+- **Power Monitoring**: Continuously records GPU and PDU power usage in a background thread.  
+- **Model Execution**: Runs each AI model sequentially while measuring power consumption.  
+- **Energy Metrics**: Computes total energy consumption and energy per token.  
+- **CSV Logging**: Stores power consumption and model performance data for analysis.  
+- **Idle State Measurement**: Includes idle power logs before and after model execution for comparison.  
+
+## How It Works  
+
+1. **Power Monitoring**  
+   - Runs in a separate thread, continuously logging power consumption.  
+   - Uses `nvidia-smi` to get GPU power draw.  
+   - Uses `snmpget` to fetch PDU power usage.  
+   - Records timestamps to match power data with execution time.  
+
+2. **Model Execution**  
+   - Loops through a list of models (`MODEL_NAMES`).  
+   - Starts power monitoring before running a model.  
+   - Runs the model inference and tracks token count & duration.  
+   - Stops monitoring after model execution.  
+
+3. **Data Logging & Statistics**  
+   - Saves power consumption data in a CSV file (`<model_name>_power.csv`).  
+   - Computes **energy per token** from power readings.  
+   - Logs model statistics separately in `<model_name>_stats.csv`.  
+
+
+
